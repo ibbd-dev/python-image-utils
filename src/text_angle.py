@@ -8,7 +8,7 @@ import numpy as np
 from scipy.ndimage import filters, interpolation
 
 
-def estimate_skew_angle(raw):
+def estimate_skew_angle(raw, min_angle=-15, max_angle=15):
     """
     估计图像文字角度
     """
@@ -34,13 +34,12 @@ def estimate_skew_angle(raw):
     flat = np.amax(flat)-flat
     flat -= np.amin(flat)
     est = flat[o0:d0-o0, o1:d1-o1]
-    angles = range(-15, 15)
     estimates = []
-    for a in angles:
+    for a in range(min_angle, max_angle):
         roest = interpolation.rotate(est, a, order=0, mode='constant')
         v = np.mean(roest, axis=1)
         v = np.var(v)
         estimates.append((v, a))
 
-    _, a = max(estimates)
-    return a
+    _, angle = max(estimates)
+    return angle

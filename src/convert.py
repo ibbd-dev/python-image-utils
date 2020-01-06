@@ -96,6 +96,34 @@ def gif_jpg(img):
     return new_img
 
 
+def rotate(image, angle, center=None, scale=1.0):
+    """cv2旋转图像
+    效果比Image.rotate效果要好
+    """
+    # 获取图像尺寸
+    (h, w) = image.shape[:2]
+
+    # 若未指定旋转中心，则将图像中心设为旋转中心
+    if center is None:
+        center = (w / 2, h / 2)
+
+    # 执行旋转
+    M = cv2.getRotationMatrix2D(center, angle, scale)
+    rotated = cv2.warpAffine(image, M, (w, h))
+
+    # 返回旋转后的图像
+    return rotated
+
+
+def rotate_pil(image, angle, center=None, scale=1.0):
+    """PIL旋转图像
+    效果比Image.rotate效果要好
+    """
+    image = np.asarray(image)
+    rotated = rotate(image)
+    return Image.fromarray(rotated)
+
+
 def intersection_area(box1, box2):
     """计算两个矩形的重叠面积"""
     x1, y1, xb1, yb1 = box1
