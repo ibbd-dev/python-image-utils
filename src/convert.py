@@ -96,9 +96,10 @@ def gif_jpg(img):
     return new_img
 
 
-def rotate(image, angle, center=None, scale=1.0):
+def rotate(image, angle, center=None, scale=1.0, borderValue=(255, 255, 255)):
     """cv2旋转图像
     效果比Image.rotate效果要好
+    :param borderValue 填充颜色，默认为白色
     """
     # 获取图像尺寸
     (h, w) = image.shape[:2]
@@ -109,7 +110,7 @@ def rotate(image, angle, center=None, scale=1.0):
 
     # 执行旋转
     M = cv2.getRotationMatrix2D(center, angle, scale)
-    rotated = cv2.warpAffine(image, M, (w, h))
+    rotated = cv2.warpAffine(image, M, (w, h), borderValue=borderValue)
 
     # 返回旋转后的图像
     return rotated
