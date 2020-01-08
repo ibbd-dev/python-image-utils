@@ -8,9 +8,12 @@ import numpy as np
 from scipy.ndimage import filters, interpolation
 
 
-def estimate_skew_angle(raw, min_angle=-15, max_angle=15):
+def estimate_skew_angle(raw, fine_tune_num=2):
     """
     估计图像文字角度
+    :param raw 待纠正的图像
+    :param fine_tune_num 微调的次数。微调次数代表角度的精度，当该值为2时，表示角度精确到10的-2次方
+    :return angle 需要纠正的角度
     """
     def resize_im(im, scale, max_scale=None):
         f = float(scale)/min(im.shape[0], im.shape[1])
@@ -34,9 +37,21 @@ def estimate_skew_angle(raw, min_angle=-15, max_angle=15):
     flat = np.amax(flat)-flat
     flat -= np.amin(flat)
     est = flat[o0:d0-o0, o1:d1-o1]
+
+    angle, step = 0, 1   # 纠正角度的初始值和步长
+    for _ in range(fine_tune_num):
+        angle = fine_tune_angle(est, step, start=angle)
+        step /= 10
+
+    return angle
+
+
+def fine_tune_angle(image, step, start=0):
+    """微调纠正"""
     estimates = []
-    for a in range(min_angle, max_angle):
-        roest = interpolation.rotate(est, a, order=0, mode='constant')
+    for a in range(-10, 11):
+        a = start + step*a
+        roest = interpolation.rotate(image, a, order=0, mode='constant')
         v = np.mean(roest, axis=1)
         v = np.var(v)
         estimates.append((v, a))
