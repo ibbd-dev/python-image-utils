@@ -17,3 +17,9 @@ OR
 pip3 install -r requirements.txt
 python3 stepup.py install
 ```
+
+## Usages
+
+```python
+from image_utils.convert import cv2_pil
+```

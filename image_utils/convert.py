@@ -35,18 +35,6 @@ def base64_cv2(b64):
     b64 = base64.b64decode(b64)
     nparr = np.fromstring(b64, np.uint8)
     return cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-    """
-    tmp = b64.split(',')[0]
-    b64 = b64[len(tmp)+1:]
-    b64 = base64.b64decode(b64)
-    img = Image.open(BytesIO(b64))
-    if 'png' in tmp:   # 先转化为jpg
-        bg = Image.new("RGB", img.size, (255, 255, 255))
-        bg.paste(img, img)
-        img = bg
-
-    return cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
-    """
 
 
 def cv2_base64(img, format='JPEG'):
@@ -99,6 +87,10 @@ def gif_jpg(img):
 def rotate(image, angle, center=None, scale=1.0, borderValue=(255, 255, 255)):
     """cv2旋转图像
     效果比Image.rotate效果要好
+    :param image cv2图像对象
+    :param angle 旋转角度（注意这里是角度，而不是弧度）
+    :param center 中心点
+    :param scale 缩放比例
     :param borderValue 填充颜色，默认为白色
     """
     # 获取图像尺寸
@@ -118,7 +110,7 @@ def rotate(image, angle, center=None, scale=1.0, borderValue=(255, 255, 255)):
 
 def rotate_pil(image, angle, center=None, scale=1.0):
     """PIL旋转图像
-    效果比Image.rotate效果要好
+    效果比Image.rotate效果要好，调用rotate进行实现
     """
     image = np.asarray(image)
     rotated = rotate(image, angle)
