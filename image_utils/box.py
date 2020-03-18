@@ -4,6 +4,7 @@
 #
 # Author: alex
 # Created Time: 2020年03月10日 星期二
+import numpy as np
 
 
 def intersection_area(box1, box2):
@@ -75,6 +76,78 @@ def boxes_in_row(box1, box2):
     # 水平方向需要相邻 & 重叠部分超过80% & 高度差不能超过20%
     # TODO 这里的参数可能不是最优的，可以经过测试调整
     return min_h/max_h > 0.8 and (x2-xb1) < 2*min_h and (h2-h1)/h1 < 0.2
+
+
+def solve(box):
+    """
+    绕 cx,cy点 w,h 旋转 angle 的坐标
+    x = cx-w/2
+    y = cy-h/2
+    x1-cx = -w/2*cos(angle) +h/2*sin(angle)
+    y1 -cy= -w/2*sin(angle) -h/2*cos(angle)
+
+    h(x1-cx) = -wh/2*cos(angle) +hh/2*sin(angle)
+    w(y1 -cy)= -ww/2*sin(angle) -hw/2*cos(angle)
+    (hh+ww)/2sin(angle) = h(x1-cx)-w(y1 -cy)
+    """
+    x1, y1, x2, y2, x3, y3, x4, y4 = box[:8]
+    cx = (x1+x3+x2+x4)/4.0
+    cy = (y1+y3+y4+y2)/4.0
+    w = (np.sqrt((x2-x1)**2+(y2-y1)**2)+np.sqrt((x3-x4)**2+(y3-y4)**2))/2
+    h = (np.sqrt((x2-x3)**2+(y2-y3)**2)+np.sqrt((x1-x4)**2+(y1-y4)**2))/2
+    # x = cx-w/2
+    # y = cy-h/2
+    # sinA = ((y2+y3)/2 - (y1+y4)/2) / w
+    sinA = (h * (x1 - cx) - w * (y1 - cy)) * 1.0 / (h * h + w * w) * 2
+    angle = np.arcsin(sinA)
+    return angle, w, h, cx, cy
+
+
+def rotate_cut_img(img, box, degree, wh, center,
+                   rotate=False, leftAdjust=1.0, rightAdjust=1.0):
+    """四边形旋转并裁剪图像，通常和solve搭配使用
+    :param img PIL图像
+    :param box 四个顶点坐标[x1, y1, x2, y2, x3, y3, x4, y4]
+    :param degree 选择角度, 对应solve函数中的angle
+    :param wh 对应solve函数中的w和h
+    :param center 中心点坐标, 对应solve函数中的cx和cy
+    """
+    # 原图坐标
+    # degree, w, h, x_center, y_center = solve(box)
+    w, h = wh
+    x_center, y_center = center
+    xmin_ = min(box[0::2])
+    xmax_ = max(box[0::2])
+    ymin_ = min(box[1::2])
+    ymax_ = max(box[1::2])
+
+    # 第一次裁剪
+    img = img.crop([xmin_, ymin_, xmax_, ymax_])
+
+    # 裁剪后的中心点
+    x_center = x_center - xmin_
+    y_center = y_center - ymin_
+
+    # 旋转时长度不变: 左上右下点坐标
+    xmin = max(0, x_center-w/2-leftAdjust*h)
+    ymin = y_center-h/2
+    xmax = min(x_center+w/2+rightAdjust*h, img.size[0]-1)
+    ymax = y_center+h/2
+
+    # 按照裁剪后的中心点旋转并裁剪
+    degree_ = degree*180.0/np.pi
+    if rotate is False:
+        crop_img = img.crop([xmin, ymin, xmax, ymax])
+    else:
+        if abs(degree_) <= 0.0001:
+            # 不需要进行旋转
+            degree_ = 0
+            crop_img = img.crop([xmin, ymin, xmax, ymax])
+        else:
+            crop_img = img.rotate(degree_, center=(x_center, y_center))\
+                .crop([xmin, ymin, xmax, ymax])
+
+    return crop_img
 
 
 if __name__ == '__main__':

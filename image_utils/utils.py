@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 #
-#
+# 其他图像工具函数
 # Author: alex
 # Created Time: 2020年03月18日 星期三 17时38分00秒
+import cv2
 import numpy as np
 from copy import deepcopy
 
@@ -52,3 +53,14 @@ def find_empty_size(gray, size, std_thr=15, mean_thr=200):
                 return (col, col+cw, row, row+ch)
 
     return None
+
+
+def count_black_points(img):
+    """计算黑点的个数，通常用于文档图像
+    :param img cv2格式的图像
+    """
+    _, binary = cv2.threshold(img, 220, 255, cv2.THRESH_BINARY)
+    h, w = binary.shape[:2]
+    # 计算黑点的个数
+    total = h*w - sum(sum(binary/255))
+    return total
