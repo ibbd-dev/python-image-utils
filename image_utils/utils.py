@@ -55,11 +55,11 @@ def find_empty_size(gray, size, std_thr=15, mean_thr=200):
     return None
 
 
-def count_black_points(img):
+def count_black_points(binary):
     """计算黑点的个数，通常用于文档图像
-    :param img cv2格式的图像
+    :param binary cv2格式的二值化图像
     """
-    _, binary = cv2.threshold(img, 220, 255, cv2.THRESH_BINARY)
+    _, binary = cv2.threshold(binary, 220, 255, cv2.THRESH_BINARY)
     h, w = binary.shape[:2]
     # 计算黑点的个数
     total = h*w - sum(sum(binary/255))

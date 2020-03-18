@@ -8,13 +8,9 @@ name="python-image-utils"
 if [ ! -d "$name" ]; then
     echo "$PWD: 当前目录错误."
 fi
-version=
-if [ $# = 1 ]; then 
-    version="-$1"
-fi
 
 date_str=`date -I`
-filename="$name-${date_str//-/}$version".zip
+filename="$name-${date_str//-/}".zip
 if [ -f "$filename" ]; then
     rm -f "$filename"
 fi
@@ -27,10 +23,10 @@ zip -r "$filename" "$name" \
     -x "*/.*" \
     -x "*/*/*.swp" \
     -x "*/__pycache__/*" \
-    -x "*/models/*/*.weights" \
-    -x "*/models/*/*/*.weights" \
+    -x "*/build/*" \
     -x "*/zip.sh" 
 
-scp "$filename" ibbd@192.168.80.242:~/ocr/ocr-v3/
+# scp "$filename" ibbd@192.168.80.242:~/ocr/ocr-v3/
+mv "$filename" /var/www/src/git.ibbd.net/cv/
 
 date
