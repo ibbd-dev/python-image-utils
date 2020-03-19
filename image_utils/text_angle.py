@@ -63,3 +63,13 @@ def fine_tune_angle(image, step, start=0):
 
     _, angle = max(estimates)
     return angle
+
+
+if __name__ == '__main__':
+    import sys
+    from convert import rotate
+    img = cv2.imread(sys.argv[1])
+    angle = estimate_skew_angle(img)
+    print(angle)
+    new_img = rotate(img, angle)
+    cv2.imwrite(sys.argv[2], new_img)
