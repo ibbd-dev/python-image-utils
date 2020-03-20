@@ -5,10 +5,10 @@ python的图片工具库
 
 ```sh
 # 安装依赖
-pip3 install -r https://github.com/cyy0523xc/python-image-utils/raw/master/requirements.txt
+pip3 install -r https://github.com/ibbd-dev/python-image-utils/raw/master/requirements.txt
 
 # 安装
-pip3 install git+https://github.com/cyy0523xc/python-image-utils.git
+pip3 install git+https://github.com/ibbd-dev/python-image-utils.git
 ```
 
 OR
