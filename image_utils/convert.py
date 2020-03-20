@@ -35,18 +35,6 @@ def base64_cv2(b64):
     b64 = base64.b64decode(b64)
     nparr = np.fromstring(b64, np.uint8)
     return cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-    """
-    tmp = b64.split(',')[0]
-    b64 = b64[len(tmp)+1:]
-    b64 = base64.b64decode(b64)
-    img = Image.open(BytesIO(b64))
-    if 'png' in tmp:   # 先转化为jpg
-        bg = Image.new("RGB", img.size, (255, 255, 255))
-        bg.paste(img, img)
-        img = bg
-
-    return cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
-    """
 
 
 def cv2_base64(img, format='JPEG'):
@@ -96,9 +84,14 @@ def gif_jpg(img):
     return new_img
 
 
-def rotate(image, angle, center=None, scale=1.0):
+def rotate(image, angle, center=None, scale=1.0, borderValue=(255, 255, 255)):
     """cv2旋转图像
     效果比Image.rotate效果要好
+    :param image cv2图像对象
+    :param angle 旋转角度（注意这里是角度，而不是弧度）
+    :param center 中心点
+    :param scale 缩放比例
+    :param borderValue 填充颜色，默认为白色
     """
     # 获取图像尺寸
     (h, w) = image.shape[:2]
@@ -109,7 +102,7 @@ def rotate(image, angle, center=None, scale=1.0):
 
     # 执行旋转
     M = cv2.getRotationMatrix2D(center, angle, scale)
-    rotated = cv2.warpAffine(image, M, (w, h))
+    rotated = cv2.warpAffine(image, M, (w, h), borderValue=borderValue)
 
     # 返回旋转后的图像
     return rotated
@@ -117,25 +110,8 @@ def rotate(image, angle, center=None, scale=1.0):
 
 def rotate_pil(image, angle, center=None, scale=1.0):
     """PIL旋转图像
-    效果比Image.rotate效果要好
+    效果比Image.rotate效果要好，调用rotate进行实现
     """
     image = np.asarray(image)
-    rotated = rotate(image)
+    rotated = rotate(image, angle)
     return Image.fromarray(rotated)
-
-
-def intersection_area(box1, box2):
-    """计算两个矩形的重叠面积"""
-    x1, y1, xb1, yb1 = box1
-    x2, y2, xb2, yb2 = box2
-
-    # 相交矩形
-    ax, ay, bx, by = max(x1, x2), max(y1, y2), min(xb1, xb2), min(yb1, yb2)
-    if ax >= bx or ay >= by:
-        return 0
-
-    # 重叠面积
-    in_area = (bx-ax) * (by-ay)
-    # print((ax, ay, bx, by))
-    # print('相交面积：%d' % in_area)
-    return in_area
