@@ -31,7 +31,7 @@ def detect_lines_angle(gray, scale, line_type='row'):
     else:
         raise Exception('error line_type value')
 
-    n, lines = cluster_fit_lines(line_img)
+    n, lines, _ = cluster_fit_lines(line_img)
     if n < 3:
         return None
     angles = [line[0] for line in lines]
@@ -69,29 +69,54 @@ def cluster_lines(data, eps=3, min_samples=2, metric='manhattan'):
     return n_clusters_, labels
 
 
-def fit_line(points):
+def fit_line(points, exchange_xy=False):
     """拟合直线
+    注意：如果是针对竖线，应该对xy轴进行交换，避免出现x=b这样的直线
     :params points [[y, x]] 图像坐标：[y, x]
+    :param exchange_xy bool 拟合直线时，决定是否需要交换x和y轴
     :return [a, b] 直线参数：y=ax+b
     """
     X = points[:, 1]
     Y = points[:, 0]
+    if exchange_xy:
+        X, Y = Y, X
+
     line = np.polyfit(X, Y, 1)
     return line
 
 
-def cluster_fit_lines(lines_img):
+def cluster_fit_lines(lines_img, exchange_xy=False):
     """直线聚合并拟合直线
     :param lines_img 直线的黑白图像
+    :param exchange_xy bool 拟合直线时，决定是否需要交换x和y轴
     :return n int 直线数量
     :return lines [[a, b]] 直线方程的参数
+    :return endpoints [[y, x]] 线段的端点
     """
     points_idx = np.argwhere(lines_img == 255)
     n, labels = cluster_lines(points_idx)
     lines = []
+    endpoints = []
     for i in range(n):
         line_points_idx = points_idx[labels == i]
-        line = fit_line(line_points_idx)
+        line = fit_line(line_points_idx, exchange_xy=exchange_xy)
         lines.append(line)
+        endpoint = get_endpoint(line, line_points_idx, exchange_xy=exchange_xy)
+        endpoints.append(endpoint)
 
-    return n, lines
+    return n, lines, endpoints
+
+
+def get_endpoint(line, points_idx, exchange_xy=False):
+    """获取线段的端点"""
+    a, b = line
+    if exchange_xy:
+        # 这个是竖线，需要找y的最大最小值
+        v_min, _ = min(points_idx)
+        v_max, _ = max(points_idx)
+        return (v_min*a+b, v_min), (v_max*a+b, v_max)
+
+    # 对于横线，需要找到x的最大最小值
+    X = [x for _, x in points_idx]
+    v_min, v_max = min(X), max(X)
+    return (v_min, v_min*a+b), (v_max, v_max*a+b)
