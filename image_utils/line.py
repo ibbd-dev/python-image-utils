@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# 表格相关基础函数
+# 直线检测与识别
 # Author: alex
 # Created Time: 2020年03月20日 星期五 16时41分48秒
 import cv2
@@ -9,16 +9,29 @@ from math import atan
 from sklearn.cluster import DBSCAN
 
 
-def detect_table_angle(gray, scale):
-    """检测表格倾斜角度
+def intersection_points(line_img1, line_img2):
+    """计算两个直线的交点图像"""
+    points = cv2.bitwise_and(line_img1, line_img2)
+    return points
+
+
+def detect_lines_angle(gray, scale, line_type='row'):
+    """检测直线的倾斜角度
     :param gray 灰度图
     :param scale 检测参数
+    :param line_type 直线类型，值为row（横线）或者col（竖线）
     :return 倾斜弧度，如果需要转换为角度: math.degrees
     """
     binary = cv2.adaptiveThreshold(~gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
                                    cv2.THRESH_BINARY, 15, -10)
-    row_img = detect_row_line(binary, scale)
-    n, lines = cluster_fit_lines(row_img)
+    if line_type == 'row':
+        line_img = detect_row_line(binary, scale)
+    elif line_type == 'col':
+        line_img = detect_col_line(binary, scale)
+    else:
+        raise Exception('error line_type value')
+
+    n, lines = cluster_fit_lines(line_img)
     if n < 3:
         return None
     angles = [line[0] for line in lines]
