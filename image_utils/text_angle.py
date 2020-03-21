@@ -8,10 +8,10 @@ import numpy as np
 from scipy.ndimage import filters, interpolation
 
 
-def estimate_skew_angle(raw, fine_tune_num=3, step_start=1.5):
+def estimate_skew_angle(gray, fine_tune_num=3, step_start=1.5):
     """
     估计图像文字角度
-    :param raw 待纠正的图像
+    :param gray 待纠正的灰度图像
     :param fine_tune_num 微调的次数, 界定了微调的精度
         当该值为n时，表示微调角度精确到step_start乘以10的-(n-1)次方
     :param step_start 步长的初始值
@@ -25,8 +25,8 @@ def estimate_skew_angle(raw, fine_tune_num=3, step_start=1.5):
             f = float(max_scale)/max(im.shape[0], im.shape[1])
         return cv2.resize(im, (0, 0), fx=f, fy=f)
 
-    raw = resize_im(raw, scale=600, max_scale=900)
-    image = raw-np.amin(raw)
+    gray = resize_im(gray, scale=600, max_scale=900)
+    image = gray-np.amin(gray)
     image = image/np.amax(image)
     m = interpolation.zoom(image, 0.5)
     m = filters.percentile_filter(m, 80, size=(20, 2))
@@ -68,7 +68,7 @@ def fine_tune_angle(image, step, start=0):
 if __name__ == '__main__':
     import sys
     from convert import rotate
-    img = cv2.imread(sys.argv[1])
+    img = cv2.imread(sys.argv[1], cv2.COLOR_BGR2GRAY)
     angle = estimate_skew_angle(img)
     print(angle)
     new_img = rotate(img, angle)

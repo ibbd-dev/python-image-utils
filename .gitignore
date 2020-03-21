@@ -100,3 +100,7 @@ ENV/
 # mypy
 .mypy_cache/
 .*
+
+# 避免本地测试图片提交到代码库
+*.jpg
+*.png
