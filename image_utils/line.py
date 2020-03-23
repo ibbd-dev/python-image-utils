@@ -113,15 +113,17 @@ def get_endpoint(line, points_idx, exchange_xy=False):
     :param line  list 直线方程的参数，值为[a, b]
     :param points_idx list 图像直线上所有点的坐标，坐标格式是[y, x]
     :param exchange_xy bool 是否对x轴和y轴进行交换，默认为False，即y=ax+b，若为True, 则是x=ay+b
+    :return endpoint1, endpoint2: 每个顶点格式[y, x]
     """
     a, b = line
     # 数据中点的坐标格式是[y, x]
     if exchange_xy:
         # 这个是竖线，需要找y的最大最小值
-        X = [x for x, _ in points_idx]
-    else:
-        X = [x for _, x in points_idx]
+        X = [y for y, _ in points_idx]
+        v_min, v_max = min(X), max(X)
+        return (v_min, v_min*a+b), (v_max, v_max*a+b)
 
     # 对于横线，需要找到x的最大最小值
+    X = [x for _, x in points_idx]
     v_min, v_max = min(X), max(X)
-    return (v_min, v_min*a+b), (v_max, v_max*a+b)
+    return (v_min*a+b, v_min), (v_max*a+b, v_max)
