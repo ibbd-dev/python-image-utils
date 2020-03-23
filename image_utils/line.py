@@ -85,15 +85,16 @@ def fit_line(points, exchange_xy=False):
     return line
 
 
-def cluster_fit_lines(lines_img, exchange_xy=False):
+def cluster_fit_lines(line_img, exchange_xy=False):
     """直线聚合并拟合直线
-    :param lines_img 直线的黑白图像
+    注意：如果是竖线，类似y=b这种，应该讲x轴和y轴进行交换
+    :param line_img 直线的黑白图像
     :param exchange_xy bool 拟合直线时，决定是否需要交换x和y轴
     :return n int 直线数量
     :return lines [[a, b]] 直线方程的参数
     :return endpoints [[y, x]] 线段的端点
     """
-    points_idx = np.argwhere(lines_img == 255)
+    points_idx = np.argwhere(line_img == 255)
     n, labels = cluster_lines(points_idx)
     lines = []
     endpoints = []
@@ -108,7 +109,11 @@ def cluster_fit_lines(lines_img, exchange_xy=False):
 
 
 def get_endpoint(line, points_idx, exchange_xy=False):
-    """获取线段的端点"""
+    """获取线段的端点
+    :param line  list 直线方程的参数，值为[a, b]
+    :param points_idx list 图像直线上所有点的坐标
+    :param exchange_xy bool 是否对x轴和y轴进行交换，默认为False，即y=ax+b，若为True, 则是x=ay+b
+    """
     a, b = line
     if exchange_xy:
         # 这个是竖线，需要找y的最大最小值
