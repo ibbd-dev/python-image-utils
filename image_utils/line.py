@@ -127,3 +127,31 @@ def get_endpoint(line, points_idx, exchange_xy=False):
     X = [x for _, x in points_idx]
     v_min, v_max = min(X), max(X)
     return (v_min*a+b, v_min), (v_max*a+b, v_max)
+
+    
+def check_segment_collinear(seg1, seg2, exchange_xy=False, b_err=4., a_err=0.1):
+    """判断两个线段是否共线
+    :param seg1 list 线段1, 格式：[a, b, (y1, x1), (y2,  x2)]。线段所在直线y=ax+b， (y1, x1)与(y2, x2)是线段两个端点
+    :param seg2 list 线段2, 格式：[a, b, (y1, x1), (y2,  x2)]
+    :param exchange_xy bool 默认为False即可，如果是竖线，则设置该值为True，这时对应的直线方程是x=ay+b
+    :param b_err float 直线方程中b参数允许的误差
+    :param a_err float 直线方程中a参数允许的误差
+    :return bool 两个线段是否共线
+    """
+    a1, b1 = seg1[:2]
+    a2, b2 = seg2[:2]
+    if abs(a1 - a2) > a_err or abs(b1 - b2) > b_err:
+        return False
+
+    # 避免两个线段有交叉
+    if exchange_xy:
+        # 竖线
+        (v11, _), (v12, _) = seg1[2:]
+        (v21, _), (v22, _) = seg2[2:]
+    else:
+        (_, v11), (_, v12) = seg1[2:]
+        (_, v21), (_, v22) = seg2[2:]
+
+    min1, max1 = min(v11, v12), max(v11, v12)
+    min2, max2 = min(v21, v22), max(v21, v22)
+    return max1 < min2 or min1 > max2
