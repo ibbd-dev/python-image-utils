@@ -1,6 +1,10 @@
 # 常用图像工具库
 python的图片工具库
 
+## 需要先安装依赖项目
+
+- https://github.com/ibbd-dev/python-ibbd-algo.git
+
 ## Install 
 
 ```sh
