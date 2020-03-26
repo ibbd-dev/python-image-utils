@@ -19,15 +19,15 @@ def line_cluster(lines, enpoints,
             for ((a, b), ((x1, y1), (x2, y2))) in zip(lines, enpoints)]
     optics = Optics(max_radius, min_samples, distance=distance)
     optics.fit(data)
-    return optics.fit(cluster_thr)
+    return optics.cluster(cluster_thr)
 
 
 def distance(line1, line2):
     """计算两个线段的距离
     :param line1,line2: [a, b, x1, y1, x2, y2]
     """
-    a1, b1, x11, y11, x12, y12 = line1
-    a2, b2, x21, y21, x22, y22 = line2
+    a1, b1, x11, y11, x12, y12 = line1.data
+    a2, b2, x21, y21, x22, y22 = line2.data
     if abs(a1-a2) < 0.001:     # 平行
         return Optics.inf
     # 计算直线交点
