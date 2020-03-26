@@ -85,11 +85,12 @@ def fit_line(points, exchange_xy=False):
     return line
 
 
-def cluster_fit_lines(line_img, exchange_xy=False):
+def cluster_fit_lines(line_img, exchange_xy=False, sorted_b=False):
     """直线聚合并拟合直线
     注意：如果是竖线，类似y=b这种，应该讲x轴和y轴进行交换
     :param line_img 直线的黑白图像
     :param exchange_xy bool 拟合直线时，决定是否需要交换x和y轴
+    :param sorted_b bool 是否按截距进行排序
     :return n int 直线数量
     :return lines [[a, b]] 直线方程的参数
     :return endpoints [[y, x]] 线段的端点
@@ -104,6 +105,12 @@ def cluster_fit_lines(line_img, exchange_xy=False):
         lines.append(line)
         endpoint = get_endpoint(line, line_points_idx, exchange_xy=exchange_xy)
         endpoints.append(endpoint)
+
+    if sorted_b and len(lines) > 1:
+        data = [(l, p) for l, p in zip(lines, endpoints)]
+        data = sorted(data, key=lambda x: x[0][-1])
+        lines = [l for l, _ in data]
+        endpoints = [p for _, p in data]
 
     return n, lines, endpoints
 
@@ -128,7 +135,7 @@ def get_endpoint(line, points_idx, exchange_xy=False):
     v_min, v_max = min(X), max(X)
     return (v_min*a+b, v_min), (v_max*a+b, v_max)
 
-    
+
 def check_segment_collinear(seg1, seg2, exchange_xy=False, b_err=4., a_err=0.1):
     """判断两个线段是否共线
     :param seg1 list 线段1, 格式：[a, b, (y1, x1), (y2,  x2)]。线段所在直线y=ax+b， (y1, x1)与(y2, x2)是线段两个端点
