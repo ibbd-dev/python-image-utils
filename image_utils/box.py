@@ -89,6 +89,7 @@ def solve(box):
     h(x1-cx) = -wh/2*cos(angle) +hh/2*sin(angle)
     w(y1 -cy)= -ww/2*sin(angle) -hw/2*cos(angle)
     (hh+ww)/2sin(angle) = h(x1-cx)-w(y1 -cy)
+    :param box 四个顶点坐标[x1, y1, x2, y2, x3, y3, x4, y4]
     """
     x1, y1, x2, y2, x3, y3, x4, y4 = box[:8]
     cx = (x1+x3+x2+x4)/4.0
@@ -149,7 +150,7 @@ def rotate_cut_img(img, box, degree, wh, center,
 
     return crop_img
 
-
+    
 if __name__ == '__main__':
     box1 = [325.8022766113281, 393.0766296386719,
             592.3567504882812, 435.80364990234375]
