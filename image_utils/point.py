@@ -16,6 +16,9 @@ def cluster_points(point_img, eps=3, min_samples=2, metric='manhattan'):
     :return labels: list: 图像上说有交点的所属类别
     """
     idx = np.argwhere(point_img == 255)
+    if len(idx) < 3:
+        return 0, [], []
+
     db = DBSCAN(eps=eps, min_samples=min_samples, metric=metric).fit(idx)
     labels = db.labels_
     n_clusters = max(labels) + 1

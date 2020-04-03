@@ -96,6 +96,9 @@ def cluster_fit_lines(line_img, exchange_xy=False, sorted_b=False):
     :return endpoints [[y, x]] 线段的端点
     """
     points_idx = np.argwhere(line_img == 255)
+    if len(points_idx) < 3:
+        return 0, [], []
+
     n, labels = cluster_lines(points_idx)
     lines = []
     endpoints = []
