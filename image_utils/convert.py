@@ -30,16 +30,20 @@ from PIL import Image
 from io import BytesIO
 
 
-def base64_cv2(b64):
+def base64_cv2(b64, is_color=True):
     """将base64格式的图片转换为cv2格式"""
     b64 = base64.b64decode(b64)
     nparr = np.fromstring(b64, np.uint8)
-    return cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    color = cv2.IMREAD_COLOR if is_color else cv2.IMREAD_GRAYSCALE
+    return cv2.imdecode(nparr, color)
 
 
-def cv2_base64(img, format='JPEG'):
+def cv2_base64(img, format='JPEG', is_color=True):
     """将cv2格式的图像转换为base64格式"""
-    out_img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+    if is_color:
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+    out_img = Image.fromarray(img)
     output_buffer = BytesIO()
     out_img.save(output_buffer, format=format)
     binary_data = output_buffer.getvalue()
@@ -65,14 +69,19 @@ def pil_base64(img, format='JPEG'):
     return str(base64.b64encode(binary_data), encoding='utf8')
 
 
-def cv2_pil(img):
+def cv2_pil(img, is_bgr=True):
     """将图片从cv2转换为PIL格式"""
-    return Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+    if is_bgr:
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+    return Image.fromarray(img)
 
 
-def pil_cv2(img):
+def pil_cv2(img, to_bgr=True):
     """将图片从PIL转换为cv2格式"""
-    return cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
+    if to_bgr:
+        return cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
+    return np.asarray(img)
 
 
 def gif_jpg(img):
