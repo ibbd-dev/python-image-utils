@@ -8,6 +8,14 @@ from PIL import ImageFont, ImageDraw
 
 font = None
 package_path = os.path.dirname(os.path.realpath(__file__))
+default_font_path = os.path.join(package_path, 'SimHei.ttf')
+
+
+def get_default_font_path():
+    """获取默认的字体文件路径
+    :return default_font_path str
+    """
+    return default_font_path
 
 
 def set_font(font_size=12, font_path=None, encoding='utf-8'):
@@ -19,7 +27,7 @@ def set_font(font_size=12, font_path=None, encoding='utf-8'):
     """
     global font
     if font_path is None:
-        font_path = os.path.join(package_path, 'SimHei.ttf')
+        font_path = default_font_path
 
     font = ImageFont.truetype(font_path, font_size, encoding=encoding)
     return font
