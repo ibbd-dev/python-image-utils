@@ -19,7 +19,7 @@ DEPENDENCIES = [
     'numpy',
 ]
 
-VERSION = '0.2.1'
+VERSION = '0.2.2'
 URL = 'https://github.com/cyy0523xc/python-image-utils'
 
 setup(
@@ -34,6 +34,9 @@ setup(
     license='Apache Software License',
 
     keywords='image utils',
-
     packages=['image_utils'],
+    package_dir={'image_utils': 'image_utils'},
+    package_data={'image_utils': ['SimHei.ttf']},
+    # 对应目录: /usr/local/image_utils/
+    # data_files=[('image_utils', ['image_utils/SimHei.ttf'])]
 )
