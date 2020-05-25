@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
-#
-# 表格聚类: 将有关联的线段聚合在一起
-# Author: alex
-# Created Time: 2020年05月25日
+"""
+表格聚类: 将有关联的线段聚合在一起
+Author: alex
+Created Time: 2020年05月25日
+"""
 import numpy as np
 from sklearn.cluster import DBSCAN
 
@@ -33,8 +33,9 @@ def table_lines_cluster(lines, eps=3, min_samples=2):
 
         new_lines.append([a, b, x1, y1, x2, y2])
 
-    db = DBSCAN(eps=eps, min_samples=min_samples, metric=distance).fit(lines)
-    return db.labels_
+    cluster = DBSCAN(eps=eps, min_samples=min_samples,
+                     metric=distance).fit(lines)
+    return cluster.labels_
 
 
 def distance(line1, line2):
@@ -43,8 +44,8 @@ def distance(line1, line2):
     x1, y1, x2, y2: 线段的两个端点
     :param line1, line2: [a, b, x1, y1, x2, y2]
     """
-    a1, b1, x11, y11, x12, y12 = line1
-    a2, b2, x21, y21, x22, y22 = line2
+    a1, b1 = line1[:2]
+    a2, b2 = line2[:2]
 
     # 计算交点
     if abs(a1-a2) < 0.01:
@@ -59,12 +60,12 @@ def distance(line1, line2):
         return min(np.linalg.norm(v1), np.linalg.norm(v2))
 
     # 计算到线1的距离
-    dist1 = point_line_dist(x11, y11, x12, y12)
+    dist1 = point_line_dist(*line1[2:])
     # 计算到线2的距离
-    dist2 = point_line_dist(x21, y21, x22, y22)
-    print(line1[2:])
-    print(line2[2:])
-    print(dist1+dist2)
+    dist2 = point_line_dist(*line2[2:])
+    # print(line1[2:])
+    # print(line2[2:])
+    # print(dist1+dist2)
     return dist1 + dist2
 
 
@@ -78,11 +79,11 @@ if __name__ == '__main__':
 
     points1 = [(1, 9), (2, 1), (7, 1.5), (10, 10)]
     points2 = [(4, 2), (5, 2), (6, 4), (3, 5)]
-    lines = [create_line(points1[i], points1[i+1])
-             for i in range(len(points1)-1)]
+    data = [create_line(points1[i], points1[i+1])
+            for i in range(len(points1)-1)]
     for i in range(len(points2)-1):
-        lines.append(create_line(points2[i], points2[i+1]))
+        data.append(create_line(points2[i], points2[i+1]))
 
-    lines.append(create_line(points2[0], points2[len(points2)-1]))
-    labels = table_lines_cluster(lines, eps=2.5)
+    data.append(create_line(points2[0], points2[len(points2)-1]))
+    labels = table_lines_cluster(data, eps=2.5)
     print(labels)
