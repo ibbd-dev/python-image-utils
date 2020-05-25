@@ -37,4 +37,5 @@ from image_utils.convert import cv2_pil
 - image_utils/text.py: 图像文字操作工具库，如往图像上输出中文字符等
 - image_utils/line.py: 直线检测与识别
 - image_utils/point.py: 点检测与识别
+- image_utils/table.py: 表格相关工具库
 - image_utils/utils.py: 图像其他工具库
