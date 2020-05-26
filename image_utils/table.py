@@ -60,9 +60,10 @@ def cal_line_params(x1, y1, x2, y2):
 
 def distance(line1, line2):
     """计算两个线段的距离
-    a, b: 线段直线参数，y=ax+b或者x=ay+b，具体看line_type的值
+    a, b: 线段直线参数: y=ax+b
     x1, y1, x2, y2: 线段的两个端点
-    :param line1, line2: [a, b, x1, y1, x2, y2]
+    :param line1, line2: [x1, y1, x2, y2, a, b]
+    :return float 两个线段的距离
     """
     a1, b1 = line1[4:]
     a2, b2 = line2[4:]
