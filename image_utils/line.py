@@ -9,6 +9,31 @@ from math import atan
 from sklearn.cluster import DBSCAN
 
 
+def intersection_line(line_a, line_b):
+    """计算两个线段的重叠部分"""
+    a1, b1 = line_a
+    a2, b2 = line_b
+    if b1 <= a2 or b2 <= a1:
+        return 0
+    return min(b1, b2) - max(a1, a2)
+
+
+def in_line_rate(line, container_line):
+    """一个线段和另一个线段的重合部分，占该线段总长的占比"""
+    inter = intersection_line(line, container_line)
+    return inter / (line[1] - line[0])
+
+
+def iou_line(line_a, line_b):
+    """两个线段的重叠占比"""
+    inter = intersection_line(line_a, line_b)
+    if inter == 0:
+        return 0
+    a1, b1 = line_a
+    a2, b2 = line_b
+    return inter / (max(b1, b2) - min(a1, a2))
+
+
 def intersection_points(line_img1, line_img2):
     """计算两个直线的交点图像"""
     points = cv2.bitwise_and(line_img1, line_img2)
@@ -139,7 +164,8 @@ def get_endpoint(line, points_idx, exchange_xy=False):
     return (v_min*a+b, v_min), (v_max*a+b, v_max)
 
 
-def check_segment_collinear(seg1, seg2, exchange_xy=False, b_err=4., a_err=0.1):
+def check_segment_collinear(seg1, seg2, exchange_xy=False, b_err=4.,
+                            a_err=0.1):
     """判断两个线段是否共线
     :param seg1 list 线段1, 格式：[a, b, (y1, x1), (y2,  x2)]。线段所在直线y=ax+b， (y1, x1)与(y2, x2)是线段两个端点
     :param seg2 list 线段2, 格式：[a, b, (y1, x1), (y2,  x2)]
