@@ -191,3 +191,11 @@ def check_segment_collinear(seg1, seg2, exchange_xy=False, b_err=4.,
     min1, max1 = min(v11, v12), max(v11, v12)
     min2, max2 = min(v21, v22), max(v21, v22)
     return max1 < min2 or min1 > max2
+
+
+if __name__ == '__main__':
+    assert intersection_line((1, 10), (20, 30)) == 0
+    assert intersection_line((1, 10), (5, 30)) == 5
+    assert in_line_rate((1, 10), (5, 30)) == 5/9
+    assert in_line_rate((5, 30), (1, 10)) == 5/25
+    assert iou_line((5, 30), (1, 10)) == 5/29
