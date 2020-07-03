@@ -19,7 +19,7 @@ DEPENDENCIES = [
     'numpy',
 ]
 
-VERSION = '0.2.7'
+VERSION = '0.2.8'
 URL = 'https://github.com/cyy0523xc/python-image-utils'
 
 setup(

@@ -4,11 +4,11 @@
 # Author: alex
 # Created Time: 2020年03月26日 星期四 15时18分41秒
 import numpy as np
-from ibbd_algo.optics import Optics
+from sklearn.cluster import DBSCAN
+# from ibbd_algo.optics import Optics
 
 
-def line_cluster(lines, line_types, enpoints,
-                 max_radius=3, min_samples=2, cluster_thr=2):
+def line_cluster(lines, line_types, enpoints, eps=2, min_samples=2):
     """将有交点的线段聚合在一起
     线段方程类型为:
         True: y=ax+b
@@ -16,23 +16,25 @@ def line_cluster(lines, line_types, enpoints,
     :param lines list 线段方程参数[(a, b)]
     :param line_types list 线段方程的类型，跟lines参数对应，取值True or False
     :param enpoints list 线段的端点，注意每个线段有两个端点: [[(y1, x1), (y2, x2)]]
-    :param min_samples, max_radius: 聚类参数
+    :param eps, min_samples: DBSCAN聚类参数
     :return labels
     """
     data = [(l_type, a, b, x1, y1, x2, y2)
-            for ((a, b), l_type, ((x1, y1), (x2, y2))) in \
+            for ((a, b), l_type, ((x1, y1), (x2, y2))) in
             zip(lines, line_types, enpoints)]
-    optics = Optics(max_radius, min_samples, distance=distance)
-    optics.fit(data)
-    return optics.cluster(cluster_thr)
+    db = DBSCAN(eps=eps, min_samples=min_samples, metric=distance).fit(data)
+    return db.labels_
+    # optics = Optics(max_radius, min_samples, distance=distance)
+    # optics.fit(data)
+    # return optics.cluster(cluster_thr)
 
 
 def distance(line1, line2):
     """计算两个线段的距离
     :param line1,line2: [a, b, x1, y1, x2, y2]
     """
-    l_type1, a1, b1, x11, y11, x12, y12 = line1.data
-    l_type2, a2, b2, x21, y21, x22, y22 = line2.data
+    l_type1, a1, b1, x11, y11, x12, y12 = line1
+    l_type2, a2, b2, x21, y21, x22, y22 = line2
 
     def format_fraction(val):
         c_val = 0.000000001
