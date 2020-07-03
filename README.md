@@ -2,9 +2,9 @@
 
 python的图片工具库
 
-## 需要先安装依赖项目
+## 相关项目
 
-- https://github.com/ibbd-dev/python-ibbd-algo.git
+- https://github.com/ibbd-dev/python-ibbd-algo.git （暂时没有依赖该项目）
 
 ## Install 
 
@@ -39,4 +39,6 @@ from image_utils.convert import cv2_pil
 - image_utils/line.py: 直线检测与识别
 - image_utils/point.py: 点检测与识别
 - image_utils/table.py: 表格相关工具库
+- image_utils/box_cluster.py: box按行或者列进行聚类
+- image_utils/data_augment.py: 图像数据增强
 - image_utils/utils.py: 图像其他工具库
