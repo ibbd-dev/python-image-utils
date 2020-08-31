@@ -3,9 +3,17 @@
 # 其他图像工具函数
 # Author: alex
 # Created Time: 2020年03月18日 星期三 17时38分00秒
-import cv2
+# import cv2
 import numpy as np
 from copy import deepcopy
+from concurrent import futures
+
+
+def conc_map(func, map_data, max_workers=None):
+    """并发执行"""
+    with futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        results = executor.map(func, map_data)
+        return list(results)
 
 
 def find_empty_size_all(gray, size, std_thr=15, mean_thr=200):
