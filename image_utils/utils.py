@@ -3,9 +3,17 @@
 # 其他图像工具函数
 # Author: alex
 # Created Time: 2020年03月18日 星期三 17时38分00秒
-import cv2
+# import cv2
 import numpy as np
 from copy import deepcopy
+from concurrent import futures
+
+
+def conc_map(func, map_data, max_workers=None):
+    """并发执行"""
+    with futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        results = executor.map(func, map_data)
+        return list(results)
 
 
 def find_empty_size_all(gray, size, std_thr=15, mean_thr=200):
@@ -55,12 +63,8 @@ def find_empty_size(gray, size, std_thr=15, mean_thr=200):
     return None
 
 
-def count_black_points(binary):
+def count_black_points(gray, thr=200):
     """计算黑点的个数，通常用于文档图像
-    :param binary cv2格式的二值化图像
+    :param gray cv2格式的灰度图像
     """
-    _, binary = cv2.threshold(binary, 220, 255, cv2.THRESH_BINARY)
-    h, w = binary.shape[:2]
-    # 计算黑点的个数
-    total = h*w - sum(sum(binary/255))
-    return total
+    return len(np.argwhere(gray < thr))

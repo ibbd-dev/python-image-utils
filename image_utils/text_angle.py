@@ -6,9 +6,11 @@
 import cv2
 import numpy as np
 from scipy.ndimage import filters, interpolation
+from utils import conc_map
 
 
-def estimate_skew_angle(gray, fine_tune_num=3, step_start=1.5):
+def estimate_skew_angle(gray, fine_tune_num=4, step_start=0.75,
+                        max_workers=None, scale=600., max_scale=900.):
     """
     估计图像文字角度
     :param gray 待纠正的灰度图像
@@ -16,16 +18,17 @@ def estimate_skew_angle(gray, fine_tune_num=3, step_start=1.5):
         当该值为n时，表示微调角度精确到step_start乘以10的-(n-1)次方
     :param step_start 步长的初始值
         当该值为a时，其纠正的角度范围是[-10*a, 10*a]。该值不应该大于4.5
+    :param max_workers int|None 并发的进程数量限制
+    :param scale, max_scale float 计算时缩放的最小最大宽高
     :return angle 需要纠正的角度
     """
-    def resize_im(im, scale, max_scale=None):
-        f = float(scale)/min(im.shape[0], im.shape[1])
-        if max_scale is not None and \
-                f*max(im.shape[0], im.shape[1]) > max_scale:
-            f = float(max_scale)/max(im.shape[0], im.shape[1])
+    def resize_im(im, scale, max_scale):
+        f = scale / min(im.shape[:2])
+        max_rate = max_scale / max(im.shape[:2])
+        f = min(f, max_rate)
         return cv2.resize(im, (0, 0), fx=f, fy=f)
 
-    gray = resize_im(gray, scale=600, max_scale=900)
+    gray = resize_im(gray, scale, max_scale)
     image = gray-np.amin(gray)
     image = image/np.amax(image)
     m = interpolation.zoom(image, 0.5)
@@ -43,24 +46,26 @@ def estimate_skew_angle(gray, fine_tune_num=3, step_start=1.5):
 
     angle, step = 0, step_start   # 纠正角度的初始值和步长
     for _ in range(fine_tune_num):
-        angle = fine_tune_angle(est, step, start=angle)
+        angle = fine_tune_angle(est, step, start=angle,
+                                max_workers=max_workers)
         step /= 10
 
     return angle
 
 
-def fine_tune_angle(image, step, start=0):
+def fine_tune_angle(image, step, start=0, max_workers=None):
     """微调纠正
     在某个角度start的周围进行微调
     """
-    estimates = []
-    for a in range(-10, 11):
-        a = start + step*a
-        roest = interpolation.rotate(image, a, order=0, mode='constant')
+    def var(i):
+        # 从-10到10
+        angle = start + (i-5)*step
+        roest = interpolation.rotate(image, angle, order=0, mode='constant')
         v = np.mean(roest, axis=1)
         v = np.var(v)
-        estimates.append((v, a))
+        return (v, angle)
 
+    estimates = conc_map(var, range(11), max_workers=max_workers)
     _, angle = max(estimates)
     return angle
 
