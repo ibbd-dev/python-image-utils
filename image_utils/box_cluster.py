@@ -5,7 +5,7 @@ Author: alex
 Created Time: 2020年07月02日 星期四 17时09分54秒
 '''
 from sklearn.cluster import DBSCAN
-from line import iou_line
+from image_utils.line import iou_line
 
 
 def boxes_cluster(boxes, row=True, col=True, iou_score=0.5):
