@@ -6,7 +6,7 @@
 import cv2
 import numpy as np
 from scipy.ndimage import filters, interpolation
-from utils import conc_map
+from image_utils.utils import conc_map
 
 
 def estimate_skew_angle(gray, fine_tune_num=4, step_start=0.75,
