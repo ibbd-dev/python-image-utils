@@ -29,8 +29,11 @@ def estimate_skew_angle(gray, fine_tune_num=4, step_start=0.75,
         return cv2.resize(im, (0, 0), fx=f, fy=f)
 
     gray = resize_im(gray, scale, max_scale)
-    image = gray-np.amin(gray)
-    image = image/np.amax(image)
+    g_min, g_max = np.amin(gray), np.amax(gray)
+    if g_max - g_min < 30:
+        return 0.
+    # 归一化
+    image = (gray-g_min) / (g_max-g_min)
     m = interpolation.zoom(image, 0.5)
     m = filters.percentile_filter(m, 80, size=(20, 2))
     m = filters.percentile_filter(m, 80, size=(2, 20))
