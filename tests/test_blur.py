@@ -23,6 +23,7 @@ def video_blur(video_path):
     print("!!! :", output_path, video_FourCC, video_fps, video_size)
     out = cv2.VideoWriter(output_path, video_FourCC, video_fps, video_size)
     blur_scores = []
+    max_score, max_img = 0, None
     while True:
         return_value, frame = vid.read()
         if not return_value:
@@ -35,6 +36,9 @@ def video_blur(video_path):
                     fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=0.50, color=(255, 0, 0), thickness=2)
         out.write(frame)
+        if score > max_score:
+            max_score = score
+            max_img = frame
 
     out.release()
     vid.release()
@@ -43,6 +47,9 @@ def video_blur(video_path):
     score = sum(blur_scores) / len(blur_scores)
     save_path = 'out_%.1f_%s' % (score, video_path.split('/')[-1])
     shutil.move(output_path, save_path)
+    # save image
+    save_path = 'out_%s.jpg' % (video_path.split('/')[-1])
+    cv2.imwrite(save_path, max_img)
     return score
 
 
