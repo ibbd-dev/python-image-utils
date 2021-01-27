@@ -121,6 +121,15 @@ def rotate(image, angle, center=None, scale=1.0, borderValue=(255, 255, 255)):
     return rotated
 
 
+def rotate_pil(image, angle, center=None, scale=1.0):
+    """PIL旋转图像
+    效果比Image.rotate效果要好，调用rotate进行实现
+    """
+    image = np.asarray(image)
+    rotated = rotate(image, angle)
+    return Image.fromarray(rotated)
+
+
 def auto_rotate(image, angle, scale=1.0, borderValue=(255, 255, 255)):
     """cv2旋转图像（自动扩充图像）
     效果比Image.rotate效果要好
@@ -152,10 +161,10 @@ def auto_rotate(image, angle, scale=1.0, borderValue=(255, 255, 255)):
     return rotated
 
 
-def rotate_pil(image, angle, center=None, scale=1.0):
-    """PIL旋转图像
+def auto_rotate_pil(image, angle, center=None, scale=1.0):
+    """PIL旋转图像（对应auto_rotate函数）
     效果比Image.rotate效果要好，调用rotate进行实现
     """
     image = np.asarray(image)
-    rotated = rotate(image, angle)
+    rotated = auto_rotate(image, angle)
     return Image.fromarray(rotated)
