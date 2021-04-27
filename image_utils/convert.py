@@ -128,3 +128,43 @@ def rotate_pil(image, angle, center=None, scale=1.0):
     image = np.asarray(image)
     rotated = rotate(image, angle)
     return Image.fromarray(rotated)
+
+
+def auto_rotate(image, angle, scale=1.0, borderValue=(255, 255, 255)):
+    """cv2旋转图像（自动扩充图像）
+    效果比Image.rotate效果要好
+    :param image cv2图像对象
+    :param angle 旋转角度（注意这里是角度，而不是弧度）
+    :param scale 缩放比例
+    :param borderValue 填充颜色，默认为白色
+    """
+    # 获取图像尺寸
+    (h, w) = image.shape[:2]
+    # 将图像中心设为旋转中心
+    center = (w / 2, h / 2)
+
+    # 执行旋转
+    M = cv2.getRotationMatrix2D(center, angle, scale)
+    cos = np.abs(M[0, 0])
+    sin = np.abs(M[0, 1])
+ 
+    # compute the new bounding dimensions of the image
+    nw = int((h * sin) + (w * cos))
+    nh = int((h * cos) + (w * sin))
+ 
+    # adjust the rotation matrix to take into account translation
+    M[0, 2] += (nw / 2) - center[0]
+    M[1, 2] += (nh / 2) - center[1]
+
+    # 返回旋转后的图像
+    rotated = cv2.warpAffine(image, M, (nw, nh), borderValue=borderValue)
+    return rotated
+
+
+def auto_rotate_pil(image, angle, center=None, scale=1.0):
+    """PIL旋转图像（对应auto_rotate函数）
+    效果比Image.rotate效果要好，调用rotate进行实现
+    """
+    image = np.asarray(image)
+    rotated = auto_rotate(image, angle)
+    return Image.fromarray(rotated)
