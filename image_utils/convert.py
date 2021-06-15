@@ -147,11 +147,11 @@ def auto_rotate(image, angle, scale=1.0, borderValue=(255, 255, 255)):
     M = cv2.getRotationMatrix2D(center, angle, scale)
     cos = np.abs(M[0, 0])
     sin = np.abs(M[0, 1])
- 
+
     # compute the new bounding dimensions of the image
     nw = int((h * sin) + (w * cos))
     nh = int((h * cos) + (w * sin))
- 
+
     # adjust the rotation matrix to take into account translation
     M[0, 2] += (nw / 2) - center[0]
     M[1, 2] += (nh / 2) - center[1]

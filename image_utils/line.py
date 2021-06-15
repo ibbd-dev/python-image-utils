@@ -135,9 +135,9 @@ def cluster_fit_lines(line_img, exchange_xy=False, sorted_b=False):
         endpoints.append(endpoint)
 
     if sorted_b and len(lines) > 1:
-        data = [(l, p) for l, p in zip(lines, endpoints)]
+        data = [(line, p) for line, p in zip(lines, endpoints)]
         data = sorted(data, key=lambda x: x[0][-1])
-        lines = [l for l, _ in data]
+        lines = [line for line, _ in data]
         endpoints = [p for _, p in data]
 
     return n, lines, endpoints
