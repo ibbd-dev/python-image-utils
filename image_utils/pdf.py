@@ -4,14 +4,14 @@ import fitz  # fitz: pip install PyMuPDF
 
 def pdf2images(doc, zoom=2, color='RGB'):
     """pdf to images
-    example: 
+    example:
         doc = fitz.open(/path/to/pdf)
         images = pdf2images(doc)
-    example: 
+    example:
         stream = open(/path/to/pdf, 'rb')
         doc = fitz.open(stream)
         images = pdf2images(doc)
-    example: 
+    example:
         doc = fitz.open(stream=bytes, filetype='bytes')
         images = pdf2images(doc)
     """
@@ -19,12 +19,13 @@ def pdf2images(doc, zoom=2, color='RGB'):
     images = []
     # mat = fitz.Matrix(zoom_x, zoom_y).preRotate(rotate)
     # for pg in range(doc.pageCount):
-        # page = doc[pg]
+    #     page = doc[pg]
     for page in doc:
         pix = page.getPixmap(matrix=mat, alpha=False)
         images.append(Image.frombytes(color, [pix.width, pix.height], pix.samples))
 
     return images
+
 
 if __name__ == "__main__":
     import sys

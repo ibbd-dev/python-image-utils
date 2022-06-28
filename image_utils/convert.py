@@ -36,6 +36,7 @@ def base64_cv2(b64, is_color=True):
     :param is_color bool 是否为彩色图像，若为True则返回彩色图像，否则返回灰度图像
     :return numpy.ndarray cv2图像
     """
+    b64 = re.sub('^data:image/.+;base64,', '', b64)
     b64 = base64.b64decode(b64)
     nparr = np.fromstring(b64, np.uint8)
     color = cv2.IMREAD_COLOR if is_color else cv2.IMREAD_GRAYSCALE
@@ -147,11 +148,11 @@ def auto_rotate(image, angle, scale=1.0, borderValue=(255, 255, 255)):
     M = cv2.getRotationMatrix2D(center, angle, scale)
     cos = np.abs(M[0, 0])
     sin = np.abs(M[0, 1])
- 
+
     # compute the new bounding dimensions of the image
     nw = int((h * sin) + (w * cos))
     nh = int((h * cos) + (w * sin))
- 
+
     # adjust the rotation matrix to take into account translation
     M[0, 2] += (nw / 2) - center[0]
     M[1, 2] += (nh / 2) - center[1]
