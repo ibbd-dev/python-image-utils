@@ -36,6 +36,7 @@ def base64_cv2(b64, is_color=True):
     :param is_color bool 是否为彩色图像，若为True则返回彩色图像，否则返回灰度图像
     :return numpy.ndarray cv2图像
     """
+    b64 = re.sub('^data:image/.+;base64,', '', b64)
     b64 = base64.b64decode(b64)
     nparr = np.fromstring(b64, np.uint8)
     color = cv2.IMREAD_COLOR if is_color else cv2.IMREAD_GRAYSCALE
